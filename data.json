@@ -1,0 +1,492 @@
+{
+  "?xml": {
+    "@version": "1.0",
+    "@encoding": "UTF-8"
+  },
+  "#text": "\n",
+  "wario": {
+    "@degree": "C",
+    "@pressure": "hPa",
+    "@serial_number": "0:50:c2:af:57:49",
+    "@model": "ME13",
+    "@firmware": "ME220014",
+    "@runtime": "1236",
+    "@freemem": "32464",
+    "@date": "2025-5-20",
+    "@time": "14:26:10",
+    "@language": "-1",
+    "@pressure_type": "1",
+    "@r": "0",
+    "@bip": "0",
+    "#text": [
+      "\n    ",
+      "\n    ",
+      "\n    ",
+      "\n    ",
+      "\n"
+    ],
+    "input": {
+      "#text": [
+        "\n        ",
+        "\n        ",
+        "\n        ",
+        "\n        ",
+        "\n        ",
+        "\n        ",
+        "\n        ",
+        "\n        ",
+        "\n        ",
+        "\n        ",
+        "\n        ",
+        "\n        ",
+        "\n        ",
+        "\n        ",
+        "\n        ",
+        "\n        ",
+        "\n        ",
+        "\n        ",
+        "\n        ",
+        "\n    "
+      ],
+      "sensor": [
+        {
+          "#text": [
+            "\n            ",
+            "\n            ",
+            "\n            ",
+            "\n            ",
+            "\n            ",
+            "\n        "
+          ],
+          "type": "wind_direction",
+          "id": "1002",
+          "name": "Wind direction",
+          "place": "",
+          "value": "315.0"
+        },
+        {
+          "#text": [
+            "\n            ",
+            "\n            ",
+            "\n            ",
+            "\n            ",
+            "\n            ",
+            "\n        "
+          ],
+          "type": "wind_speed",
+          "id": "1003",
+          "name": "Wind speed",
+          "place": "",
+          "value": "1.5"
+        },
+        {
+          "#text": [
+            "\n            ",
+            "\n            ",
+            "\n            ",
+            "\n            ",
+            "\n            ",
+            "\n        "
+          ],
+          "type": "wind_gust",
+          "id": "1004",
+          "name": "Wind gust",
+          "place": "",
+          "value": "2.6"
+        },
+        {
+          "#text": [
+            "\n            ",
+            "\n            ",
+            "\n            ",
+            "\n            ",
+            "\n            ",
+            "\n        "
+          ],
+          "type": "precipitation",
+          "id": "1005",
+          "name": "Precipitation",
+          "place": "",
+          "value": "0.0"
+        },
+        {
+          "#text": [
+            "\n            ",
+            "\n            ",
+            "\n            ",
+            "\n            ",
+            "\n            ",
+            "\n        "
+          ],
+          "type": "temperature",
+          "id": "1006",
+          "name": "Temperature",
+          "place": "",
+          "value": "13.0"
+        },
+        {
+          "#text": [
+            "\n            ",
+            "\n            ",
+            "\n            ",
+            "\n            ",
+            "\n            ",
+            "\n        "
+          ],
+          "type": "humidity",
+          "id": "1007",
+          "name": "Humidity",
+          "place": "",
+          "value": "74.2"
+        },
+        {
+          "#text": [
+            "\n            ",
+            "\n            ",
+            "\n            ",
+            "\n            ",
+            "\n            ",
+            "\n        "
+          ],
+          "type": "pressure",
+          "id": "1008",
+          "name": "Pressure",
+          "place": "",
+          "value": "1023.4"
+        },
+        {
+          "#text": [
+            "\n            ",
+            "\n            ",
+            "\n            ",
+            "\n            ",
+            "\n            ",
+            "\n        "
+          ],
+          "type": "exposure",
+          "id": "1009",
+          "name": "Light",
+          "place": "",
+          "value": "386.6"
+        },
+        {
+          "#text": [
+            "\n            ",
+            "\n            ",
+            "\n            ",
+            "\n            ",
+            "\n            ",
+            "\n        "
+          ],
+          "type": "dew_point",
+          "id": "1010",
+          "name": "Dew point",
+          "place": "",
+          "value": "8.5"
+        },
+        {
+          "#text": [
+            "\n            ",
+            "\n            ",
+            "\n            ",
+            "\n            ",
+            "\n            ",
+            "\n        "
+          ],
+          "type": "temperature_apparent",
+          "id": "1011",
+          "name": "T Apparent",
+          "place": "",
+          "value": "11.4"
+        },
+        {
+          "#text": [
+            "\n            ",
+            "\n            ",
+            "\n            ",
+            "\n            ",
+            "\n            ",
+            "\n        "
+          ],
+          "type": "exposure_ideal",
+          "id": "1012",
+          "name": "Exposure ideal",
+          "place": "",
+          "value": "1096.0"
+        },
+        {
+          "#text": [
+            "\n            ",
+            "\n            ",
+            "\n            ",
+            "\n            ",
+            "\n            ",
+            "\n        "
+          ],
+          "type": "ping",
+          "id": "1013",
+          "name": "PING0",
+          "place": "",
+          "value": "INACTIVE"
+        },
+        {
+          "#text": [
+            "\n            ",
+            "\n            ",
+            "\n            ",
+            "\n            ",
+            "\n            ",
+            "\n        "
+          ],
+          "type": "ping",
+          "id": "1014",
+          "name": "PING0",
+          "place": "",
+          "value": "INACTIVE"
+        },
+        {
+          "#text": [
+            "\n            ",
+            "\n            ",
+            "\n            ",
+            "\n            ",
+            "\n            ",
+            "\n        "
+          ],
+          "type": "ping",
+          "id": "1015",
+          "name": "PING0",
+          "place": "",
+          "value": "INACTIVE"
+        },
+        {
+          "#text": [
+            "\n            ",
+            "\n            ",
+            "\n            ",
+            "\n            ",
+            "\n            ",
+            "\n        "
+          ],
+          "type": "ping",
+          "id": "1016",
+          "name": "PING0",
+          "place": "",
+          "value": "INACTIVE"
+        },
+        {
+          "#text": [
+            "\n            ",
+            "\n            ",
+            "\n            ",
+            "\n            ",
+            "\n            ",
+            "\n        "
+          ],
+          "type": "ping",
+          "id": "1017",
+          "name": "PING0",
+          "place": "",
+          "value": "INACTIVE"
+        },
+        {
+          "#text": [
+            "\n            ",
+            "\n            ",
+            "\n            ",
+            "\n            ",
+            "\n            ",
+            "\n        "
+          ],
+          "type": "ping",
+          "id": "1018",
+          "name": "PING0",
+          "place": "",
+          "value": "INACTIVE"
+        },
+        {
+          "#text": [
+            "\n            ",
+            "\n            ",
+            "\n            ",
+            "\n            ",
+            "\n            ",
+            "\n        "
+          ],
+          "type": "ping",
+          "id": "1019",
+          "name": "PING0",
+          "place": "",
+          "value": "INACTIVE"
+        },
+        {
+          "#text": [
+            "\n            ",
+            "\n            ",
+            "\n            ",
+            "\n            ",
+            "\n            ",
+            "\n        "
+          ],
+          "type": "ping",
+          "id": "1020",
+          "name": "PING0",
+          "place": "",
+          "value": "INACTIVE"
+        }
+      ]
+    },
+    "output": {
+      "#text": [
+        "\n        ",
+        "\n        ",
+        "\n    "
+      ],
+      "sensor": [
+        {
+          "#text": [
+            "\n            ",
+            "\n            ",
+            "\n            ",
+            "\n            ",
+            "\n            ",
+            "\n        "
+          ],
+          "type": "io",
+          "id": "1000",
+          "name": "OUT1",
+          "place": "",
+          "value": "0"
+        },
+        {
+          "#text": [
+            "\n            ",
+            "\n            ",
+            "\n            ",
+            "\n            ",
+            "\n            ",
+            "\n        "
+          ],
+          "type": "io",
+          "id": "1001",
+          "name": "OUT2",
+          "place": "",
+          "value": "0"
+        }
+      ]
+    },
+    "variable": {
+      "#text": [
+        "\n        ",
+        "\n        ",
+        "\n        ",
+        "\n        ",
+        "\n        ",
+        "\n        ",
+        "\n        ",
+        "\n        ",
+        "\n        ",
+        "\n        ",
+        "\n        ",
+        "\n        ",
+        "\n        ",
+        "\n        ",
+        "\n        ",
+        "\n        ",
+        "\n        ",
+        "\n        ",
+        "\n        ",
+        "\n        ",
+        "\n    "
+      ],
+      "sunrise": "4:54",
+      "sunset": "20:32",
+      "civstart": "4:14",
+      "civend": "21:12",
+      "nautstart": "3:19",
+      "nautend": "22:7",
+      "astrostart": "2:1",
+      "astroend": "23:25",
+      "daylen": "15:37",
+      "civlen": "16:58",
+      "nautlen": "18:47",
+      "astrolen": "21:24",
+      "moonphase": "8",
+      "isday": "1",
+      "bio": "2",
+      "pressure_old": "1023.2",
+      "temperature_avg": "6.66",
+      "agl": "549",
+      "fog": "0",
+      "lsp": "29"
+    },
+    "minmax": {
+      "#text": [
+        "\n        ",
+        "\n        ",
+        "\n        ",
+        "\n        ",
+        "\n        ",
+        "\n        ",
+        "\n        ",
+        "\n        ",
+        "\n        ",
+        "\n        ",
+        "\n    "
+      ],
+      "s": [
+        {
+          "@id": "1002",
+          "@min": "0.0",
+          "@max": "315.0"
+        },
+        {
+          "@id": "1003",
+          "@min": "0.0",
+          "@max": "4.1"
+        },
+        {
+          "@id": "1004",
+          "@min": "0.0",
+          "@max": "5.4"
+        },
+        {
+          "@id": "1005",
+          "@min": "0.0",
+          "@max": "1.5"
+        },
+        {
+          "@id": "1006",
+          "@min": "7.8",
+          "@max": "14.7"
+        },
+        {
+          "@id": "1007",
+          "@min": "67.1",
+          "@max": "95.9"
+        },
+        {
+          "@id": "1008",
+          "@min": "1022.3",
+          "@max": "1024.5"
+        },
+        {
+          "@id": "1009",
+          "@min": "0.0",
+          "@max": "555.6"
+        },
+        {
+          "@id": "1010",
+          "@min": "6.8",
+          "@max": "9.0"
+        },
+        {
+          "@id": "1011",
+          "@min": "4.6",
+          "@max": "13.5"
+        }
+      ]
+    }
+  },
+  "timestamp": "2025-10-04T13:13:13.8748209Z"
+}

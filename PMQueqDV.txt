@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wario degree="C" pressure="hPa" serial_number="0:50:c2:af:57:49" model="ME13" firmware="ME220014" runtime="1236" freemem="32464" date="2025-5-20" time="14:26:10" language="-1" pressure_type="1" r="0" bip="0">
+    <input>
+        <sensor>
+            <type>wind_direction</type>
+            <id>1002</id>
+            <name>Wind direction</name>
+            <place></place>
+            <value>315.0</value>
+        </sensor>
+        <sensor>
+            <type>wind_speed</type>
+            <id>1003</id>
+            <name>Wind speed</name>
+            <place></place>
+            <value>1.5</value>
+        </sensor>
+        <sensor>
+            <type>wind_gust</type>
+            <id>1004</id>
+            <name>Wind gust</name>
+            <place></place>
+            <value>2.6</value>
+        </sensor>
+        <sensor>
+            <type>precipitation</type>
+            <id>1005</id>
+            <name>Precipitation</name>
+            <place></place>
+            <value>0.0</value>
+        </sensor>
+        <sensor>
+            <type>temperature</type>
+            <id>1006</id>
+            <name>Temperature</name>
+            <place></place>
+            <value>13.0</value>
+        </sensor>
+        <sensor>
+            <type>humidity</type>
+            <id>1007</id>
+            <name>Humidity</name>
+            <place></place>
+            <value>74.2</value>
+        </sensor>
+        <sensor>
+            <type>pressure</type>
+            <id>1008</id>
+            <name>Pressure</name>
+            <place></place>
+            <value>1023.4</value>
+        </sensor>
+        <sensor>
+            <type>exposure</type>
+            <id>1009</id>
+            <name>Light</name>
+            <place></place>
+            <value>386.6</value>
+        </sensor>
+        <sensor>
+            <type>dew_point</type>
+            <id>1010</id>
+            <name>Dew point</name>
+            <place></place>
+            <value>8.5</value>
+        </sensor>
+        <sensor>
+            <type>temperature_apparent</type>
+            <id>1011</id>
+            <name>T Apparent</name>
+            <place></place>
+            <value>11.4</value>
+        </sensor>
+        <sensor>
+            <type>exposure_ideal</type>
+            <id>1012</id>
+            <name>Exposure ideal</name>
+            <place></place>
+            <value>1096.0</value>
+        </sensor>
+        <sensor>
+            <type>ping</type>
+            <id>1013</id>
+            <name>PING0</name>
+            <place></place>
+            <value>INACTIVE</value>
+        </sensor>
+        <sensor>
+            <type>ping</type>
+            <id>1014</id>
+            <name>PING0</name>
+            <place></place>
+            <value>INACTIVE</value>
+        </sensor>
+        <sensor>
+            <type>ping</type>
+            <id>1015</id>
+            <name>PING0</name>
+            <place></place>
+            <value>INACTIVE</value>
+        </sensor>
+        <sensor>
+            <type>ping</type>
+            <id>1016</id>
+            <name>PING0</name>
+            <place></place>
+            <value>INACTIVE</value>
+        </sensor>
+        <sensor>
+            <type>ping</type>
+            <id>1017</id>
+            <name>PING0</name>
+            <place></place>
+            <value>INACTIVE</value>
+        </sensor>
+        <sensor>
+            <type>ping</type>
+            <id>1018</id>
+            <name>PING0</name>
+            <place></place>
+            <value>INACTIVE</value>
+        </sensor>
+        <sensor>
+            <type>ping</type>
+            <id>1019</id>
+            <name>PING0</name>
+            <place></place>
+            <value>INACTIVE</value>
+        </sensor>
+        <sensor>
+            <type>ping</type>
+            <id>1020</id>
+            <name>PING0</name>
+            <place></place>
+            <value>INACTIVE</value>
+        </sensor>
+    </input>
+    <output>
+        <sensor>
+            <type>io</type>
+            <id>1000</id>
+            <name>OUT1</name>
+            <place></place>
+            <value>0</value>
+        </sensor>
+        <sensor>
+            <type>io</type>
+            <id>1001</id>
+            <name>OUT2</name>
+            <place></place>
+            <value>0</value>
+        </sensor>
+    </output>
+    <variable>
+        <sunrise>4:54</sunrise>
+        <sunset>20:32</sunset>
+        <civstart>4:14</civstart>
+        <civend>21:12</civend>
+        <nautstart>3:19</nautstart>
+        <nautend>22:7</nautend>
+        <astrostart>2:1</astrostart>
+        <astroend>23:25</astroend>
+        <daylen>15:37</daylen>
+        <civlen>16:58</civlen>
+        <nautlen>18:47</nautlen>
+        <astrolen>21:24</astrolen>
+        <moonphase>8</moonphase>
+        <isday>1</isday>
+        <bio>2</bio>
+        <pressure_old>1023.2</pressure_old>
+        <temperature_avg>6.66</temperature_avg>
+        <agl>549</agl>
+        <fog>0</fog>
+        <lsp>29</lsp>
+    </variable>
+    <minmax>
+        <s id="1002" min="0.0" max="315.0"/>
+        <s id="1003" min="0.0" max="4.1"/>
+        <s id="1004" min="0.0" max="5.4"/>
+        <s id="1005" min="0.0" max="1.5"/>
+        <s id="1006" min="7.8" max="14.7"/>
+        <s id="1007" min="67.1" max="95.9"/>
+        <s id="1008" min="1022.3" max="1024.5"/>
+        <s id="1009" min="0.0" max="555.6"/>
+        <s id="1010" min="6.8" max="9.0"/>
+        <s id="1011" min="4.6" max="13.5"/>
+    </minmax>
+</wario>
