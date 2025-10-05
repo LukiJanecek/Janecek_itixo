@@ -21,6 +21,7 @@ namespace Janecek_itixo
         static async Task<int> Main(string[] args)
         {
             Console.WriteLine("Starting data mining.");
+            Console.WriteLine("Starting data miner (type 'start', 'stop', 'quit' or 'q' to quit).");
 
             await EnsureSqliteDbAsync();
 
@@ -42,48 +43,93 @@ namespace Janecek_itixo
 
             url = ForcePastebinRaw(url);
 
-            while (true) {
-                try
+            var cts = new CancellationTokenSource();
+            var token = cts.Token;
+
+            bool running = false;
+
+            _ = Task.Run(async () =>
+            {
+                while (!token.IsCancellationRequested)
                 {
-                    string xmlText = await DownloadXmlAsync(url);
+                    var line = Console.ReadLine();
+                    if (line == null) continue;
 
-                    string json = ConvertXmlToJson(xmlText);
-
-                    string finalJson = AddTimestamp(json);
-                    //Console.WriteLine(finalJson);
-
-                    await File.WriteAllTextAsync(outputFile, finalJson);
-                    Console.WriteLine($"JSON saved to {outputFile}");
-
-                    // save to DB
-                    await SaveRecordAsync(url, isAvailable: true, payloadJson: finalJson, errorMessage: null);
-                    Console.WriteLine("Data successfully saved to database.");
-                }
-                catch (Exception ex)
-                {
-                    // empty record with unavailability flag and timestamp
-                    var emptyRecord = new JObject
+                    line = line.Trim().ToLowerInvariant();
+                    switch (line)
                     {
-                        ["timestamp"] = DateTime.UtcNow.ToString("o"),
-                        ["is_available"] = false,
-                        ["error"] = ex.Message
-                    };
+                        case "start":
+                            running = true;
+                            Console.WriteLine("Measurement loop started.");
+                            break;
+                        case "stop":
+                            running = false;
+                            Console.WriteLine("Measurement loop stopped.");
+                            break;
+                        case "quit" or "q":
+                            Console.WriteLine("Quitting...");
+                            cts.Cancel();
+                            return;
+                        default:
+                            Console.WriteLine("Unknown command. Use: start / stop / quit / q");
+                            break;
+                    }
+                }
+            });
 
-                    string fallbackJson = emptyRecord.ToString(Formatting.Indented);
-                    //Console.WriteLine(fallbackJson);
+            while (!token.IsCancellationRequested)
+            {
+                if (running)
+                {
+                    try
+                    {
+                        string xmlText = await DownloadXmlAsync(url);
 
-                    await File.WriteAllTextAsync(outputFile, fallbackJson);
-                    Console.WriteLine($"JSON saved to {outputFile}");
+                        string json = ConvertXmlToJson(xmlText);
 
-                    // save to DB
-                    await SaveRecordAsync(url, isAvailable: false, payloadJson: null, errorMessage: ex.Message);
-                    Console.WriteLine("Blank data successfully saved to database.");
+                        string finalJson = AddTimestamp(json);
+                        //Console.WriteLine(finalJson);
+
+                        await File.WriteAllTextAsync(outputFile, finalJson);
+                        Console.WriteLine($"JSON saved to {outputFile}");
+
+                        // save to DB
+                        await SaveRecordAsync(url, isAvailable: true, payloadJson: finalJson, errorMessage: null);
+                        Console.WriteLine("Data successfully saved to database.");
+                    }
+                    catch (Exception ex)
+                    {
+                        // empty record with unavailability flag and timestamp
+                        var emptyRecord = new JObject
+                        {
+                            ["timestamp"] = DateTime.UtcNow.ToString("o"),
+                            ["is_available"] = false,
+                            ["error"] = ex.Message
+                        };
+
+                        string fallbackJson = emptyRecord.ToString(Formatting.Indented);
+                        //Console.WriteLine(fallbackJson);
+
+                        await File.WriteAllTextAsync(outputFile, fallbackJson);
+                        Console.WriteLine($"JSON saved to {outputFile}");
+
+                        // save to DB
+                        await SaveRecordAsync(url, isAvailable: false, payloadJson: null, errorMessage: ex.Message);
+                        Console.WriteLine("Blank data successfully saved to database.");
+                    }
+
+                    // 
+                    Console.WriteLine($"Waiting {period.TotalMinutes} minutes to another reading.");
+                    await Task.Delay(period);
+                }
+                else
+                {
+                    Console.WriteLine("Loop paused. Type 'start' to resume.");
                 }
 
-                // 
-                Console.WriteLine($"Waiting {period.TotalMinutes} minutes to another reading.");
-                await Task.Delay(period);
+                await Task.Delay(period, token).ContinueWith(_ => { });
             }
+            return 0;
         }
 
         private static string ForcePastebinRaw(string url)
