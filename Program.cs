@@ -1,9 +1,7 @@
 ﻿using System.Data;
 using System.Xml.Linq;
 using System.Net.Http;
-using Dapper;
 using Microsoft.Data.Sqlite;
-using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -65,6 +63,63 @@ namespace Janecek_itixo
                         case "stop":
                             running = false;
                             Console.WriteLine("Measurement loop stopped.");
+                            break;
+                        case "showdb":
+                            try
+                            {
+                                if (File.Exists(databasePath))
+                                {
+                                    await using var conn = new SqliteConnection(GetSqliteConnectionString());
+                                    await conn.OpenAsync();
+
+                                    var cmd = conn.CreateCommand();
+                                    cmd.CommandText = @"
+                                    SELECT Id, Timestamp, IsAvailable, PayloadJson, ErrorMessage
+                                    FROM WeatherReadings
+                                    ORDER BY Id ASC;";   
+
+                                    await using var reader = await cmd.ExecuteReaderAsync();
+                                    Console.WriteLine("=== Records from database.sqlite ===");
+
+                                    while (await reader.ReadAsync())
+                                    {
+                                        var id = reader.GetInt32(0);
+                                        var ts = reader.GetString(1);
+                                        var avail = reader.GetInt32(2);
+                                        var payload = reader.IsDBNull(3) ? null : reader.GetString(3);
+                                        var err = reader.IsDBNull(4) ? null : reader.GetString(4);
+
+                                        Console.WriteLine($"Id={id} | {ts} | Avail={avail}");
+                                        if (!string.IsNullOrEmpty(err))
+                                            Console.WriteLine($"  Error: {err}");
+
+                                        if (!string.IsNullOrEmpty(payload))
+                                        {
+                                            try
+                                            {
+                                                // pretty print JSON payload
+                                                var pretty = JToken.Parse(payload).ToString(Formatting.Indented);
+                                                Console.WriteLine(pretty);
+                                            }
+                                            catch
+                                            {
+                                                Console.WriteLine(payload);
+                                            }
+                                        }
+
+                                        Console.WriteLine("----------------------------------------");
+                                    }
+                                    Console.WriteLine("========================================");
+                                }
+                                else
+                                {
+                                    Console.WriteLine("File database.sqlite doesn't exist.");
+                                }
+                            }
+                            catch (Exception ex)
+                            {
+                                Console.WriteLine($"Erro in reading database.sqlite: {ex.Message}");
+                            }
                             break;
                         case "quit" or "q":
                             Console.WriteLine("Quitting...");
@@ -275,7 +330,5 @@ namespace Janecek_itixo
 
             await cmd.ExecuteNonQueryAsync();
         }
-
-
     }
 }
