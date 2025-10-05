@@ -43,7 +43,7 @@ namespace Janecek_itixo
 
             var cts = new CancellationTokenSource();
             var token = cts.Token;
-
+            var sleepCts = new CancellationTokenSource();
             bool running = false;
 
             _ = Task.Run(async () =>
@@ -59,10 +59,14 @@ namespace Janecek_itixo
                         case "start":
                             running = true;
                             Console.WriteLine("Measurement loop started.");
+                            sleepCts.Cancel();             
+                            sleepCts = new CancellationTokenSource();
                             break;
                         case "stop":
                             running = false;
                             Console.WriteLine("Measurement loop stopped.");
+                            sleepCts.Cancel();           
+                            sleepCts = new CancellationTokenSource();
                             break;
                         case "showdb":
                             try
@@ -124,6 +128,7 @@ namespace Janecek_itixo
                         case "quit" or "q":
                             Console.WriteLine("Quitting...");
                             cts.Cancel();
+                            sleepCts.Cancel();
                             return;
                         default:
                             Console.WriteLine("Unknown command. Use: start / stop / quit / q");
@@ -136,55 +141,65 @@ namespace Janecek_itixo
             {
                 if (running)
                 {
-                    try
-                    {
-                        string xmlText = await DownloadXmlAsync(url);
-
-                        string json = ConvertXmlToJson(xmlText);
-
-                        string finalJson = AddTimestamp(json);
-                        //Console.WriteLine(finalJson);
-
-                        await File.WriteAllTextAsync(outputFile, finalJson);
-                        Console.WriteLine($"JSON saved to {outputFile}");
-
-                        // save to DB
-                        await SaveRecordAsync(url, isAvailable: true, payloadJson: finalJson, errorMessage: null);
-                        Console.WriteLine("Data successfully saved to database.");
-                    }
-                    catch (Exception ex)
-                    {
-                        // empty record with unavailability flag and timestamp
-                        var emptyRecord = new JObject
-                        {
-                            ["timestamp"] = DateTime.UtcNow.ToString("o"),
-                            ["is_available"] = false,
-                            ["error"] = ex.Message
-                        };
-
-                        string fallbackJson = emptyRecord.ToString(Formatting.Indented);
-                        //Console.WriteLine(fallbackJson);
-
-                        await File.WriteAllTextAsync(outputFile, fallbackJson);
-                        Console.WriteLine($"JSON saved to {outputFile}");
-
-                        // save to DB
-                        await SaveRecordAsync(url, isAvailable: false, payloadJson: null, errorMessage: ex.Message);
-                        Console.WriteLine("Blank data successfully saved to database.");
-                    }
+                    await MeasureOnceAsync(url);
 
                     // 
                     Console.WriteLine($"Waiting {period.TotalMinutes} minutes to another reading.");
-                    await Task.Delay(period);
+                    try
+                    {
+                        await Task.Delay(period, sleepCts.Token); 
+                    }
+                    catch (OperationCanceledException)
+                    {
+                        // start/stop/quit interupted waiting
+                    }
                 }
                 else
                 {
                     Console.WriteLine("Loop paused. Type 'start' to resume.");
+                    try
+                    {
+                        await Task.Delay(Timeout.InfiniteTimeSpan, sleepCts.Token); // čekej do start/stop/quit
+                    }
+                    catch (OperationCanceledException)
+                    {
+                        // wakuep start/stop/quit – loop continues
+                    }
                 }
-
-                await Task.Delay(period, token).ContinueWith(_ => { });
             }
             return 0;
+        }
+
+        static async Task MeasureOnceAsync(string url)
+        {
+            try
+            {
+                string xmlText = await DownloadXmlAsync(url);
+                string json = ConvertXmlToJson(xmlText);
+                string finalJson = AddTimestamp(json);
+
+                await File.WriteAllTextAsync(outputFile, finalJson);
+                Console.WriteLine($"JSON saved to {outputFile}");
+
+                Console.WriteLine("Data successfully saved to database.");
+                await SaveRecordAsync(url, isAvailable: true, payloadJson: finalJson, errorMessage: null);
+            }
+            catch (Exception ex)
+            {
+                var emptyRecord = new JObject
+                {
+                    ["timestamp"] = DateTime.UtcNow.ToString("o"),
+                    ["is_available"] = false,
+                    ["error"] = ex.Message
+                };
+                string fallbackJson = emptyRecord.ToString(Formatting.Indented);
+
+                await File.WriteAllTextAsync(outputFile, fallbackJson);
+                Console.WriteLine($"JSON saved to {outputFile}");
+
+                await SaveRecordAsync(url, isAvailable: false, payloadJson: null, errorMessage: ex.Message);
+                Console.WriteLine("Blank data successfully saved to database.");
+            }
         }
 
         private static string ForcePastebinRaw(string url)
