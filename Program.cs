@@ -2,6 +2,7 @@
 using System.Xml.Linq;
 using System.Net.Http;
 using Dapper;
+using Microsoft.Data.Sqlite;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -13,12 +14,15 @@ namespace Janecek_itixo
 {
     public class Program
     {
+        public static string solutionPath = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, @"..\..\.."));
+        public static string outputFile = Path.Combine(solutionPath, "data.json");
+        public static string databasePath = Path.Combine(solutionPath, "database.sqlite");
+
         static async Task<int> Main(string[] args)
         {
             Console.WriteLine("Starting data mining.");
 
-            string solutionPath = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, @"..\..\.."));
-            string outputFile = Path.Combine(solutionPath, "data.json");
+            await EnsureSqliteDbAsync();
 
             var config = new ConfigurationBuilder()
                 .SetBasePath(solutionPath)
@@ -27,6 +31,8 @@ namespace Janecek_itixo
                 .Build();
 
             var url = config["DataSource:SourceUrl"];
+            var intervalMin = int.TryParse(config["DataSource:PollIntervalMinutes"], out var m) ? m : 60;
+            var period = TimeSpan.FromMinutes(Math.Max(1, intervalMin));
 
             if (string.IsNullOrWhiteSpace(url))
             {
@@ -36,37 +42,47 @@ namespace Janecek_itixo
 
             url = ForcePastebinRaw(url);
 
-            try
-            {
-                string xmlText = await DownloadXmlAsync(url);
-
-                string json = ConvertXmlToJson(xmlText);
-
-                string finalJson = AddTimestamp(json);
-                //Console.WriteLine(finalJson);
-
-                await File.WriteAllTextAsync(outputFile, finalJson);
-                Console.WriteLine($"JSON uložen do {outputFile}");
-
-                return 0;
-            }
-            catch (Exception ex)
-            {
-                // empty record with unavailability flag and timestamp
-                var emptyRecord = new JObject
+            while (true) {
+                try
                 {
-                    ["timestamp"] = DateTime.UtcNow.ToString("o"),
-                    ["is_available"] = false,
-                    ["error"] = ex.Message
-                };
+                    string xmlText = await DownloadXmlAsync(url);
 
-                string fallbackJson = emptyRecord.ToString(Formatting.Indented);
-                //Console.WriteLine(fallbackJson);
+                    string json = ConvertXmlToJson(xmlText);
 
-                await File.WriteAllTextAsync(outputFile, fallbackJson);
-                Console.WriteLine($"JSON uložen do {outputFile}");
+                    string finalJson = AddTimestamp(json);
+                    //Console.WriteLine(finalJson);
 
-                return 2;
+                    await File.WriteAllTextAsync(outputFile, finalJson);
+                    Console.WriteLine($"JSON saved to {outputFile}");
+
+                    // save to DB
+                    await SaveRecordAsync(url, isAvailable: true, payloadJson: finalJson, errorMessage: null);
+                    Console.WriteLine("Data successfully saved to database.");
+                }
+                catch (Exception ex)
+                {
+                    // empty record with unavailability flag and timestamp
+                    var emptyRecord = new JObject
+                    {
+                        ["timestamp"] = DateTime.UtcNow.ToString("o"),
+                        ["is_available"] = false,
+                        ["error"] = ex.Message
+                    };
+
+                    string fallbackJson = emptyRecord.ToString(Formatting.Indented);
+                    //Console.WriteLine(fallbackJson);
+
+                    await File.WriteAllTextAsync(outputFile, fallbackJson);
+                    Console.WriteLine($"JSON saved to {outputFile}");
+
+                    // save to DB
+                    await SaveRecordAsync(url, isAvailable: false, payloadJson: null, errorMessage: ex.Message);
+                    Console.WriteLine("Blank data successfully saved to database.");
+                }
+
+                // 
+                Console.WriteLine($"Waiting {period.TotalMinutes} minutes to another reading.");
+                await Task.Delay(period);
             }
         }
 
@@ -100,7 +116,7 @@ namespace Janecek_itixo
             var xmlText = await resp.Content.ReadAsStringAsync();
             if (string.IsNullOrWhiteSpace(xmlText))
             {
-                throw new InvalidOperationException("Prázdná odpověď");
+                throw new InvalidOperationException("Empty answer");
             }
                 
 
@@ -109,7 +125,7 @@ namespace Janecek_itixo
             }
             catch (Exception ex) 
             { 
-                throw new InvalidOperationException($"Nevalidní XML: {ex.Message}"); 
+                throw new InvalidOperationException($"Nonvalid XML: {ex.Message}"); 
             }
 
             return xmlText;
@@ -132,5 +148,88 @@ namespace Janecek_itixo
             obj["timestamp"] = DateTime.UtcNow.ToString("o");
             return obj.ToString(Formatting.Indented); 
         }
+
+        // SQL database 
+        static string GetSqliteConnectionString()
+        {
+            return new SqliteConnectionStringBuilder
+            {
+                DataSource = databasePath,
+                Mode = SqliteOpenMode.ReadWriteCreate,
+                Cache = SqliteCacheMode.Default
+            }.ToString();
+        }
+
+        static async Task EnsureSqliteDbAsync()
+        {
+            Directory.CreateDirectory(solutionPath);
+
+            if (File.Exists(databasePath))
+            {
+                try
+                {
+                    await using var testConn = new SqliteConnection(GetSqliteConnectionString());
+                    await testConn.OpenAsync();
+
+                    await using var pragma = testConn.CreateCommand();
+                    pragma.CommandText = "PRAGMA schema_version;";
+                    await pragma.ExecuteScalarAsync();
+                }
+                catch (SqliteException)
+                {
+                    try 
+                    { 
+                        File.Delete(databasePath); 
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.Error.WriteLine($"Can't delete nonvalid DB´file: {ex.Message}");
+                        throw;
+                    }
+                }
+            }
+
+            await using var conn = new SqliteConnection(GetSqliteConnectionString());
+            await conn.OpenAsync();
+
+            await using (var cmd = conn.CreateCommand())
+            {
+                cmd.CommandText = @"
+                CREATE TABLE IF NOT EXISTS WeatherReadings (
+                    Id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    Timestamp TEXT NOT NULL,
+                    SourceUrl TEXT NOT NULL,
+                    IsAvailable INTEGER NOT NULL,
+                    PayloadJson TEXT NULL,
+                    ErrorMessage TEXT NULL
+                );";
+                await cmd.ExecuteNonQueryAsync();
+
+                // CREATE INDEX 
+                cmd.CommandText = @"
+                CREATE INDEX IF NOT EXISTS IX_WeatherReadings_Timestamp ON WeatherReadings(Timestamp DESC);";
+                await cmd.ExecuteNonQueryAsync();
+            }
+        }
+
+        static async Task SaveRecordAsync(string sourceUrl, bool isAvailable, string? payloadJson, string? errorMessage)
+        {
+            await using var conn = new SqliteConnection(GetSqliteConnectionString());
+            await conn.OpenAsync();
+
+            var cmd = conn.CreateCommand();
+            cmd.CommandText = @"
+            INSERT INTO WeatherReadings (Timestamp, SourceUrl, IsAvailable, PayloadJson, ErrorMessage)
+            VALUES ($ts, $url, $avail, $payload, $err);";
+            cmd.Parameters.AddWithValue("$ts", DateTime.UtcNow.ToString("o"));
+            cmd.Parameters.AddWithValue("$url", sourceUrl);
+            cmd.Parameters.AddWithValue("$avail", isAvailable ? 1 : 0);
+            cmd.Parameters.AddWithValue("$payload", (object?)payloadJson ?? DBNull.Value);
+            cmd.Parameters.AddWithValue("$err", (object?)errorMessage ?? DBNull.Value);
+
+            await cmd.ExecuteNonQueryAsync();
+        }
+
+
     }
 }
